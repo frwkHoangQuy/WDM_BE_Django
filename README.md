@@ -15,9 +15,9 @@ DATABASE_PASSWORD = 'mật_khẩu'
 DATABASE_HOST = 'địa_chỉ_host'
 DATABASE_PORT = 'cổng'
 ```
-Lưu ý thay thế các giá trị tên_cơ_sở_dữ_liệu, tên_người_dùng, mật_khẩu, địa_chỉ_host và cổng bằng thông tin cụ thể của cơ sở dữ liệu MySQL bạn đang sử dụng.
-
-## 3. 3. Kiểm tra kết nối với cơ sở dữ liệu
+-   Lưu ý thay thế các giá trị tên_cơ_sở_dữ_liệu, tên_người_dùng, mật_khẩu, địa_chỉ_host và cổng bằng thông tin cụ thể của cơ sở dữ liệu MySQL bạn đang sử dụng.
+-   Sử dụng dữ liệu trong file init_sql.sql để khởi tạo giá trị cho các quan hệ
+## 3. Kiểm tra kết nối với cơ sở dữ liệu
 ```commandline
 python manage.py migrate
 ```
