@@ -1,0 +1,6 @@
+DATABASE_ENGINE = 'django.db.backends.mysql'
+DATABASE_NAME = 'WDM_BE_Django'
+DATABASE_USER = 'root'
+DATABASE_PASSWORD = '@frwkHoangQuy@'
+DATABASE_HOST = '127.0.0.1'
+DATABASE_PORT = '3306'
