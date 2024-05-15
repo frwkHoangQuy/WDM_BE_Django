@@ -1,33 +1,35 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password, make_password
+from django.http import HttpResponse, JsonResponse
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from .serializers import LoginSerializer, RegisterSerializer
-from django.contrib.auth import authenticate
-from django.http import JsonResponse
+
 from .models import User
-from django.contrib.auth.hashers import make_password
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.hashers import check_password
+from .serializers import LoginSerializer, RegisterSerializer
+
+import jwt
+
+from datetime import datetime, timedelta
 
 
 class LoginView(APIView):
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
-
-            # Debug thông tin đăng nhập
-            print(f"Attempting login with username: {username} and password: {password}")
-
-            # Sử dụng phương thức authenticate để xác thực người dùng
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                token, created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key}, status=status.HTTP_200_OK)
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            if check_password(password, user.password):
+                expiration_time = datetime.utcnow() + timedelta(hours=1)
+                payload = {'user_id': str(user.id), 'exp': expiration_time}
+                token = jwt.encode(payload, 'your_secret_key', algorithm='HS256')
+                return Response({'token': token}, status=status.HTTP_200_OK)
             else:
                 print("Authentication failed: Invalid credentials")
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
@@ -54,6 +56,7 @@ class RegisterView(APIView):
 
 
 class DeleteUserByUsernameView(APIView):
+
     def delete(self, request, username):
         try:
             instance = User.objects.filter(username=username)
