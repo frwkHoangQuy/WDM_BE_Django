@@ -1,6 +1,4 @@
-from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password, make_password
-from django.http import HttpResponse, JsonResponse
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -61,6 +59,6 @@ class DeleteUserByUsernameView(APIView):
         try:
             instance = User.objects.filter(username=username)
             instance.delete()
-            return HttpResponse("Success")
+            return Response("Success")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
