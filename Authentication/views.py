@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import jwt
 import time
+from django.views.decorators.csrf import csrf_exempt
 
 from User.models import User, Role
 from .serializers import LoginSerializer, RegisterSerializer
@@ -15,6 +16,7 @@ from .utils.create_token_payload import create_token_payload
 class LoginView(APIView):
 
     def post(self, request):
+        print(123)
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
@@ -46,26 +48,19 @@ class RegisterView(APIView):
                 password = serializer.validated_data['password']
                 display_name = serializer.validated_data['display_name']
                 role_name = serializer.validated_data['role_name']
-
+                
                 # Kiểm tra sự tồn tại của người dùng
                 existing_user = User.objects.filter(username=username).exists()
                 if existing_user:
                     return Response({'error': 'Username đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
-
                 # Kiểm tra sự tồn tại của Role
                 try:
                     role = Role.objects.get(name=role_name)
-                    # Lấy role_id từ role_name
-                    role_id = Role.objects.get(name=role_name).id
                 except Role.DoesNotExist:
                     return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Lấy role_id từ role_name
-                role_id = Role.objects.get(name=role_name).id
-
-                # Tạo user
                 user = User(username=username, password=make_password(password),
-                            display_name=display_name, role_id=role_id)
+                    display_name=display_name, role_id=role.id)
                 user.save()
                 return Response({'Tạo người dùng thành công'}, status=status.HTTP_201_CREATED)
             else:
@@ -73,15 +68,16 @@ class RegisterView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+@csrf_exempt
 def verify_token(request):
     token = request.headers.get('Authorization', '').split('Bearer ')
     if len(token) != 2:
         return JsonResponse({'error': 'Token is missing'}, status=401)
     token = token[1]
+    print(token)
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-        return JsonResponse({'message': 'Token is valid'}, status=200)
+        return JsonResponse({'data': payload}, status=200)
     except jwt.ExpiredSignatureError:
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
