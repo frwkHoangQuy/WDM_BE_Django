@@ -75,12 +75,3 @@ class RegisterView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class DeleteUserByUsernameView(APIView):
-
-    def delete(self, request, username):
-        try:
-            instance = User.objects.filter(username=username)
-            instance.delete()
-            return Response("Success")
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

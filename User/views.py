@@ -47,7 +47,16 @@ class UsersViews(APIView):
                             user_permissions_roles[user['id']]["PermissionList"].append(permission)
 
         response_data = list(user_permissions_roles.values())
-
-
-
         return Response(response_data)
+
+
+class DeleteUserByUsernameView(APIView):
+
+    def delete(self, request, username):
+        try:
+            instance = User.objects.filter(username=username)
+            instance.delete()
+            return Response("Success")
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
