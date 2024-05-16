@@ -1,9 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Permission, Role, RolePermission, User
-from .serializers import UserSerializers, RoleSerializers, PermissionSerializers, RolePermissionSerializers
 
 
 class UsersViews(APIView):
@@ -11,42 +11,40 @@ class UsersViews(APIView):
     def get(self, request):
         response_data = []
         users = User.objects.all()
-        role_permissions = RolePermission.objects.all()
-        permissions = Permission.objects.all()
-        roles = Role.objects.all()
+        for user in users:
+            temp = {
+                'id': user.id,
+                'display_name': user.display_name,
+                'role_id': user.role_id,
+                'username': user.username,
+                'created_at': user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                'updated_at': user.updated_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            permissionList = []
+            try:
+                role_permissions = RolePermission.objects.filter(role_id=user.role_id)
+                for role_permission in role_permissions:
+                    permission = Permission.objects.get(id=role_permission.permission_id)
+                    permissionList.append({
+                        "id": str(permission.id),
+                        "name": permission.name,
+                        "description": permission.description,
+                        "page": permission.page,
+                        "created_at": permission.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                        "updated_at": permission.updated_at.strftime("%Y-%m-%d %H:%M:%S")
+                    })
+            except ObjectDoesNotExist:
+                pass
+            temp['PermissionList'] = permissionList
 
-        users_serializers = UserSerializers(users, many=True).data
-        role_permissions_serializers = RolePermissionSerializers(role_permissions, many=True).data
-        permissions_serializers = PermissionSerializers(permissions, many=True).data
-        roles_serializers = RoleSerializers(roles, many=True).data
+            try:
+                user_role = Role.objects.get(id=user.role_id)
+                temp['role'] = user_role.name
+            except ObjectDoesNotExist:
+                temp['role'] = None
 
-        role_dict = {role['id']: role['name'] for role in roles_serializers}
+            response_data.append(temp)
 
-        user_permissions_roles = {}
-        for role_permission in role_permissions_serializers:
-            role_id = role_permission['role_id']
-            permission_id = role_permission['permission_id']
-
-            for user in users_serializers:
-                user_role_id = user['role_id']
-                if user_role_id == role_id:
-                    if user['id'] not in user_permissions_roles:
-                        user_permissions_roles[user['id']] = {
-                            "id": user['id'],
-                            "display_name": user['display_name'],
-                            "username": user['username'],
-                            "password": user['password'],
-                            "created_at": user['created_at'],
-                            "updated_at": user['updated_at'],
-                            "role_id": user['role_id'],
-                            "PermissionList": [],
-                            "role": role_dict.get(role_id, "")
-                        }
-                    for permission in permissions_serializers:
-                        if permission['id'] == permission_id:
-                            user_permissions_roles[user['id']]["PermissionList"].append(permission)
-
-        response_data = list(user_permissions_roles.values())
         return Response(response_data)
 
 
