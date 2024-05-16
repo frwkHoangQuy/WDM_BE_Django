@@ -28,7 +28,7 @@ class LoginView(APIView):
             if check_password(password, user.password):
                 payload = create_token_payload(username)
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token}, status=status.HTTP_200_OK)
+                return Response({'access_token': token}, status=status.HTTP_200_OK)
             else:
                 print("Authentication failed: Invalid credentials")
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
@@ -67,6 +67,7 @@ class RegisterView(APIView):
                 return Response({'Lỗi: Thông tin không hợp lệ'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @csrf_exempt
 def verify_token(request):
