@@ -11,3 +11,4 @@ class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
     display_name = serializers.CharField()
+    role_name = serializers.CharField()
