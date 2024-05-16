@@ -1,14 +1,14 @@
 from django.contrib.auth.hashers import check_password, make_password
-
-from rest_framework import status
-from rest_framework.response import Response
+from django.conf import settings
+from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import jwt
+import time
 
 from User.models import User, Role
 from .serializers import LoginSerializer, RegisterSerializer
-
-import jwt
-
 from .utils.create_token_payload import create_token_payload
 
 
@@ -25,7 +25,7 @@ class LoginView(APIView):
                 return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
             if check_password(password, user.password):
                 payload = create_token_payload(username)
-                token = jwt.encode(payload, 'your_secret_key', algorithm='HS256')
+                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
                 return Response({'token': token}, status=status.HTTP_200_OK)
             else:
                 print("Authentication failed: Invalid credentials")
@@ -65,7 +65,7 @@ class RegisterView(APIView):
 
                 # Tạo user
                 user = User(username=username, password=make_password(password),
-                                display_name=display_name, role_id=role_id)
+                            display_name=display_name, role_id=role_id)
                 user.save()
                 return Response({'Tạo người dùng thành công'}, status=status.HTTP_201_CREATED)
             else:
@@ -74,3 +74,15 @@ class RegisterView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+def verify_token(request):
+    token = request.headers.get('Authorization', '').split('Bearer ')
+    if len(token) != 2:
+        return JsonResponse({'error': 'Token is missing'}, status=401)
+    token = token[1]
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        return JsonResponse({'message': 'Token is valid'}, status=200)
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)

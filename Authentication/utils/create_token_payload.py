@@ -7,7 +7,10 @@ def create_token_payload(username):
     data = {}
     permissionList = []
     user = User.objects.get(username=username)
-    expiration_time = datetime.utcnow() + timedelta(hours=1)
+    iat = datetime.utcnow()
+    expiration_time = iat + timedelta(hours=1)
+    exp = int(expiration_time.timestamp())
+
     try:
         role_permissions = RolePermission.objects.filter(role_id=user.role_id)
         for role_permission in role_permissions:
@@ -34,5 +37,7 @@ def create_token_payload(username):
     data['sub'] = str(user.id)
     data['permissionList'] = permissionList
     data['role'] = role
-    data['exp'] = expiration_time.strftime("%Y-%m-%d %H:%M:%S")
+    data['iat'] = iat.timestamp()
+    data['exp'] = datetime.utcnow() + timedelta(hours=1)
+
     return data
