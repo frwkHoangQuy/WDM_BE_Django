@@ -1,5 +1,7 @@
 USE WDM_BE_Django;
-
+ALTER TABLE Role MODIFY COLUMN id CHAR(36);
+ALTER TABLE RolePermission MODIFY COLUMN role_id CHAR(36);
+ALTER TABLE User MODIFY COLUMN role_id CHAR(36);
 -- ============================
 -- INIT PERMISSION
 -- ============================
@@ -38,12 +40,14 @@ VALUES
 -- tk: test
 -- mk: test
 -- ============================
-INSERT INTO `WDM`.`User`
+
+INSERT INTO `User`
 (
     `id`,
     `display_name`,
     `username`,
     `password`,
+    `role_id`,
     `created_at`,
     `updated_at`
 )
@@ -53,6 +57,7 @@ VALUES
     'canh pham',
     'test',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
     NOW(),
     NOW()
 ),
@@ -61,6 +66,7 @@ VALUES
     'Quy Khung',
     'test1',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
     NOW(),
     NOW()
 ),
@@ -69,40 +75,11 @@ VALUES
     'Minh Tue',
     'test2',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
     NOW(),
     NOW()
 );
 
--- ============================
--- SET ROLE ADMIN FOR USER "test"
--- ============================
-
-INSERT INTO `UserRole`
-(
-    `user_id`,
-    `role_id`,
-    `created_at`,
-    `updated_at`
-)
-VALUES
-(
-    'JIrWE1qRjTxBWzeFwIGGL',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-),
-(
-    'JIrWE1qRjTxBWzeFwIGPM',
-    '64007797-029d-4339-b78b-d51e2d2f3e1a',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-),
-(
-    'JIrWE1qRjTxBWzeFwIGPT',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-);
 
 -- ============================
 -- INIT LOBBY TYPE
@@ -174,5 +151,4 @@ INSERT INTO Service (id, name, price, status, inventory) VALUES
 ('x7C8v9B0n1M2q3W4e5r', 'Lễ dân sự tại nhà', 10000000, true, 100),
 ('y6U7i8O9p0A1s2D3f4g', 'MC đám cưới', 8000000, true, 100),
 ('t5R6y7U8i9O0p1A2s3d', 'Bánh cưới', 5000000, true, 100);
-
 
