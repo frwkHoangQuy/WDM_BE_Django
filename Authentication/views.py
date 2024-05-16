@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from User.models import User
+from User.models import User, Role
 from .serializers import LoginSerializer, RegisterSerializer
 
 import jwt
@@ -44,7 +44,10 @@ class RegisterView(APIView):
                 username = serializer.validated_data['username']
                 password = serializer.validated_data['password']
                 display_name = serializer.validated_data['display_name']
-                user = User(username=username, password=make_password(password), display_name=display_name)
+                role_name = serializer.validated_data['role_name']
+                role_id = Role.objects.get(name=role_name).id
+                user = User(username=username, password=make_password(password),
+                            display_name=display_name, role_id=role_id)
                 user.save()
                 return Response({'success': 'User created successfully'}, status=status.HTTP_201_CREATED)
             else:
