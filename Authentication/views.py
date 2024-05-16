@@ -41,17 +41,36 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         try:
             if serializer.is_valid():
+
+                # Kiểm tra dữ liệu trả về
                 username = serializer.validated_data['username']
                 password = serializer.validated_data['password']
                 display_name = serializer.validated_data['display_name']
                 role_name = serializer.validated_data['role_name']
+
+                # Kiểm tra sự tồn tại của người dùng
+                existing_user = User.objects.filter(username=username).exists()
+                if existing_user:
+                    return Response({'error': 'Username đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Kiểm tra sự tồn tại của Role
+                try:
+                    role = Role.objects.get(name=role_name)
+                    # Lấy role_id từ role_name
+                    role_id = Role.objects.get(name=role_name).id
+                except Role.DoesNotExist:
+                    return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Lấy role_id từ role_name
                 role_id = Role.objects.get(name=role_name).id
+
+                # Tạo user
                 user = User(username=username, password=make_password(password),
-                            display_name=display_name, role_id=role_id)
+                                display_name=display_name, role_id=role_id)
                 user.save()
-                return Response({'success': 'User created successfully'}, status=status.HTTP_201_CREATED)
+                return Response({'Tạo người dùng thành công'}, status=status.HTTP_201_CREATED)
             else:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Lỗi: Thông tin không hợp lệ'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
