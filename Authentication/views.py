@@ -9,7 +9,7 @@ from .serializers import LoginSerializer, RegisterSerializer
 
 import jwt
 
-from datetime import datetime, timedelta
+from .utils.create_token_payload import create_token_payload
 
 
 class LoginView(APIView):
@@ -24,8 +24,7 @@ class LoginView(APIView):
             except User.DoesNotExist:
                 return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
             if check_password(password, user.password):
-                expiration_time = datetime.utcnow() + timedelta(hours=1)
-                payload = {'user_id': str(user.id), 'exp': expiration_time}
+                payload = create_token_payload(username)
                 token = jwt.encode(payload, 'your_secret_key', algorithm='HS256')
                 return Response({'token': token}, status=status.HTTP_200_OK)
             else:

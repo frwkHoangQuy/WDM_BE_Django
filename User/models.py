@@ -51,4 +51,3 @@ class RolePermission(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['role_id', 'permission_id'], name='unique_role_permission')
         ]
-
