@@ -61,7 +61,6 @@ class RegisterView(APIView):
                 
                 role_id = str(role.id)
                 role_id = role_id.replace('-', '')
-                print("role", role_id)
                 user = User(
                     username=username,
                     password=make_password(password),
