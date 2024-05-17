@@ -1,4 +1,4 @@
-use WDM_TEST;
+use WDM_BE_Django;
 
 -- ============================
 -- INIT PERMISSION
@@ -17,8 +17,8 @@ VALUES
 -- ============================
 INSERT INTO Role (id, name, created_at, updated_at)
 VALUES
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'Admin', NOW(), NOW()),
-  ('64007797-029d-4339-b78b-d51e2d2f3e1a', 'Staff', NOW(), NOW())
+  ('6ac907e7902f4feb8da20becac50bedc', 'Admin', NOW(), NOW()),
+  ('6ac907e7902f4feb8da20becac50beda', 'Staff', NOW(), NOW())
 ;
 
 -- ============================
@@ -26,11 +26,11 @@ VALUES
 -- ============================
 INSERT INTO RolePermission (role_id, permission_id, created_at, updated_at)
 VALUES
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'perm1', NOW(), NOW()),
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'perm2', NOW(), NOW()),
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'perm3', NOW(), NOW()),
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'perm4', NOW(), NOW()),
-  ('c5a5b477-73f5-4a97-b657-b2fd7a8efaae', 'perm5', NOW(), NOW())
+  ('6ac907e7902f4feb8da20becac50bedc', 'perm1', NOW(), NOW()),
+  ('6ac907e7902f4feb8da20becac50bedc', 'perm2', NOW(), NOW()),
+  ('6ac907e7902f4feb8da20becac50bedc', 'perm3', NOW(), NOW()),
+  ('6ac907e7902f4feb8da20becac50bedc', 'perm4', NOW(), NOW()),
+  ('6ac907e7902f4feb8da20becac50bedc', 'perm5', NOW(), NOW())
 ;
 
 -- ============================
@@ -54,7 +54,7 @@ VALUES
     'canh pham',
     'test',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
+    '6ac907e7902f4feb8da20becac50bedc',
     NOW(),
     NOW()
 ),
@@ -63,7 +63,7 @@ VALUES
     'Quy Khung',
     'test1',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
+    '6ac907e7902f4feb8da20becac50bedc',
     NOW(),
     NOW()
 ),
@@ -72,7 +72,7 @@ VALUES
     'Minh Tue',
     'test2',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
-    '64007797-029d-4339-b78b-d51e2d2f3e1a',
+    '6ac907e7902f4feb8da20becac50bedc',
     NOW(),
     NOW()
 );
