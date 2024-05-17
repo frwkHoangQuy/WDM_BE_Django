@@ -28,6 +28,7 @@ class LoginView(APIView):
                 return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
             if check_password(password, user.password):
                 payload = create_token_payload(username)
+                
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
                 return Response({'access_token': token}, status=status.HTTP_200_OK)
             else:

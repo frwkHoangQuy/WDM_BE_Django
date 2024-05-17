@@ -12,7 +12,8 @@ def create_token_payload(username):
     exp = int(expiration_time.timestamp())
 
     try:
-        role_permissions = RolePermission.objects.filter(role_id=user.role_id)
+        role_id = str(user.role_id)
+        role_permissions = RolePermission.objects.filter(role_id=role_id)
         for role_permission in role_permissions:
             permission = Permission.objects.get(id=role_permission.permission_id)
             permissionList.append({
@@ -27,9 +28,9 @@ def create_token_payload(username):
         pass
     role = {}
     try:
-        roles = user.role_id
-        role['id'] = str(roles.id)
-        role['name'] = roles.name
+        roleData = Role.objects.get(id=user.role_id)
+        role['id'] = role_id
+        role['name'] = roleData.name
     except ObjectDoesNotExist:
         pass
 
