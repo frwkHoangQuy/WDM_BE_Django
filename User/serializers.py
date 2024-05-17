@@ -36,4 +36,8 @@ class RolePermissionSerializers(serializers.Serializer):
     updated_at = serializers.DateTimeField()
 
 
+class CreateNewRoleSerializers(serializers.Serializer):
+    name = serializers.CharField()
+
+
 

@@ -3,7 +3,7 @@ import uuid
 
 
 class Permission(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=191)
     description = models.CharField(max_length=191, null=True, blank=True)
     page = models.CharField(max_length=50)
@@ -18,7 +18,7 @@ class Permission(models.Model):
 
 
 class Role(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=1000)
     name = models.CharField(max_length=191, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -28,11 +28,11 @@ class Role(models.Model):
 
 
 class User(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=1000)
     display_name = models.CharField(max_length=191)
     username = models.CharField(max_length=191, unique=True)
     password = models.CharField(max_length=191)
-    role_id = models.UUIDField(default=0)
+    role_id = models.ForeignKey(Role, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -41,13 +41,14 @@ class User(models.Model):
 
 
 class RolePermission(models.Model):
-    role_id = models.UUIDField()
-    permission_id = models.UUIDField()
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'RolePermission'
         constraints = [
-            models.UniqueConstraint(fields=['role_id', 'permission_id'], name='unique_role_permission')
+            models.UniqueConstraint(fields=['role', 'permission'], name='unique_role_permission')
         ]
+        unique_together = [['role', 'permission']]

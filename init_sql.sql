@@ -1,4 +1,4 @@
-USE WDM_BE_Django;
+use WDM_TEST;
 
 -- ============================
 -- INIT PERMISSION
@@ -38,12 +38,13 @@ VALUES
 -- tk: test
 -- mk: test
 -- ============================
-INSERT INTO `WDM`.`User`
+INSERT INTO `User`
 (
     `id`,
     `display_name`,
     `username`,
     `password`,
+    `role_id`,
     `created_at`,
     `updated_at`
 )
@@ -53,6 +54,7 @@ VALUES
     'canh pham',
     'test',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
     NOW(),
     NOW()
 ),
@@ -61,6 +63,7 @@ VALUES
     'Quy Khung',
     'test1',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
     NOW(),
     NOW()
 ),
@@ -69,40 +72,11 @@ VALUES
     'Minh Tue',
     'test2',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
+    '64007797-029d-4339-b78b-d51e2d2f3e1a',
     NOW(),
     NOW()
 );
 
--- ============================
--- SET ROLE ADMIN FOR USER "test"
--- ============================
-
-INSERT INTO `UserRole`
-(
-    `user_id`,
-    `role_id`,
-    `created_at`,
-    `updated_at`
-)
-VALUES
-(
-    'JIrWE1qRjTxBWzeFwIGGL',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-),
-(
-    'JIrWE1qRjTxBWzeFwIGPM',
-    '64007797-029d-4339-b78b-d51e2d2f3e1a',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-),
-(
-    'JIrWE1qRjTxBWzeFwIGPT',
-    'c5a5b477-73f5-4a97-b657-b2fd7a8efaae',
-    '2024-03-21 04:22:05.578',
-    '2024-03-21 04:22:05.578'
-);
 
 -- ============================
 -- INIT LOBBY TYPE
@@ -127,7 +101,7 @@ INSERT INTO Lobby (id, name, lob_type_id) VALUES
 -- ============================
 -- INIT FOODS
 -- ============================
-INSERT INTO WDM.Food (id, name, price, inventory) VALUES
+INSERT INTO Food (id, name, price, inventory) VALUES
 ('n1x2c3v4b5n6m7l8k9j0', 'Gỏi cuốn', 50000, 100),
 ('q1w2e3r4t5y6u7i8o9p0', 'Bánh mì thịt nướng', 30000, 150),
 ('a1s2d3f4g5h6j7k8l9z0', 'Phở bò', 45000, 200),
