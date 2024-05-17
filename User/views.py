@@ -151,3 +151,36 @@ def update_role_permission(request):
     except Exception as e:
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['DELETE'])
+def remove_role_permission(request):
+    role_id = request.data.get('roleID')
+    permission_id = request.data.get('permissionID')
+
+    if not role_id or not permission_id:
+        return Response({'error': 'role_id and permission_id are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Check if the role exists in the database
+        try:
+            role = Role.objects.get(id=role_id)
+        except Role.DoesNotExist:
+            return Response({'error': 'Role does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the role has the specified permission
+        role_permission_check = RolePermission.objects.filter(role_id=role_id, permission_id=permission_id)
+
+        if not role_permission_check.exists():
+            return Response({'error': f'Role ID: {role_id} does not have permission: {permission_id}'}, status=status.HTTP_409_CONFLICT)
+
+        # Delete the role-permission association
+        role_permission_check.delete()
+
+        return Response({'message': 'Permission removed from role successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+    except ObjectDoesNotExist as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(e)
+        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
