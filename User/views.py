@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 
 from .models import Permission, Role, RolePermission, User
 
@@ -115,3 +116,38 @@ class getRole(APIView):
             temp['permissions'] = permission_list
         return data_response
 
+
+@api_view(['POST'])
+def update_role_permission(request):
+    role_id = request.data.get('roleID')
+    permission_id = request.data.get('permissionID')
+
+    if not role_id or not permission_id:
+        return Response({'error': 'roleID and permissionID are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Check if the role exists in the database
+        try:
+            role = Role.objects.get(id=role_id)
+        except Role.DoesNotExist:
+            return Response({'error': 'Role does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the role already has the specified permission
+        if RolePermission.objects.filter(role_id=role_id, permission_id=permission_id).exists():
+            return Response({'error': f'Role ID: {role_id} already has permission: {permission_id}'}, status=status.HTTP_409_CONFLICT)
+        
+        # Create the role-permission association
+        role_permission = RolePermission.objects.create(role_id=role_id, permission_id=permission_id)
+        
+        return Response({
+            'role_id': role_permission.role_id,
+            'permission_id': role_permission.permission_id,
+            'created_at': role_permission.created_at,
+            'updated_at': role_permission.updated_at
+        }, status=status.HTTP_201_CREATED)
+
+    except ObjectDoesNotExist as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(e)
+        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
