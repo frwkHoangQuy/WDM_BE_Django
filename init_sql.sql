@@ -50,7 +50,7 @@ INSERT INTO `User`
 )
 VALUES
 (
-    'JIrWE1qRjTxBWzeFwIGGL',
+    '827cdd116faa437598a10adb739e20e2',
     'canh pham',
     'test',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
@@ -59,7 +59,7 @@ VALUES
     NOW()
 ),
 (
-    'JIrWE1qRjTxBWzeFwIGPT',
+    '827cdd116faa437598a10adb739e20e1',
     'Quy Khung',
     'test1',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
@@ -68,7 +68,7 @@ VALUES
     NOW()
 ),
 (
-    'JIrWE1qRjTxBWzeFwIGPM',
+    '827cdd116faa437598a10adb739e20e4',
     'Minh Tue',
     'test2',
     '$2a$10$BQ3PJs7iCxr.UNFHVnAoBeP0.QKp04kzc7/YwpSB/gx0ygPeFG5NO',
