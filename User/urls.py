@@ -2,11 +2,17 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views
 
-urlpatterns = [
-    path('users/<str:id>/delete/', views.DeleteUserByUsernameView.as_view(), name="Delete"),
-    path('users/role/create/', views.createRole.as_view(), name="CreateRole"),
-    path('users/', views.UsersViews.as_view(), name="Users"),
-    path('privilege/roles/', views.get_roles, name="get_roles"),
-    path('privilege/role/update', views.update_role_permission, name="update_role_permission"),
-    path('privilege/role/delete/', views.remove_role_permission, name='remove_role_permission'),
+privilege_urls = [
+    path('privilege/roles/', views.PermissionViews.as_view(), name="get_roles_list"),
+    path('privilege/role/delete/<str:id>/', views.PermissionViews.as_view(), name='delete_role_permission'),
+    path('privilege/role/update/', views.PermissionViews.as_view(), name="update_role"),
+    path('privilege/role/', views.PermissionViews.as_view(), name="create_role"),
 ]
+
+user_url = [
+    path('users/<str:id>/delete/', views.AccountInformationView.as_view(), name="Delete"),
+    path('users/', views.AccountInformationView.as_view(), name="Users"),
+]
+
+urlpatterns = [] + privilege_urls + user_url
+

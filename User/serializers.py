@@ -38,6 +38,12 @@ class RolePermissionSerializers(serializers.Serializer):
 
 class CreateNewRoleSerializers(serializers.Serializer):
     name = serializers.CharField()
+    permissionList = serializers.ListField()
+
+
+class UpdatePermissionForRole(serializers.Serializer):
+    roleID = serializers.UUIDField()
+    permissionID = serializers.CharField()
 
 
 

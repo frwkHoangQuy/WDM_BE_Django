@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,10 +7,95 @@ from rest_framework.decorators import api_view
 
 from .models import Permission, Role, RolePermission, User
 
-from .serializers import CreateNewRoleSerializers
+from .serializers import CreateNewRoleSerializers, UpdatePermissionForRole
 
 
 class UsersViews(APIView):
+
+    def get(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
+
+class PermissionViews(UsersViews):
+
+    def get(self, request):
+        permission = request.query_params.get('permission', 'false').lower() == 'true'
+
+        try:
+            if permission:
+                roles = Role.objects.prefetch_related('rolepermission_set__permission').all()
+                role_data = []
+                for role in roles:
+                    role_permissions = role.rolepermission_set.all()
+                    permissions = [rp.permission for rp in role_permissions]
+                    role_data.append({
+                        'id': role.id,
+                        'name': role.name,
+                        'created_at': role.created_at,
+                        'updated_at': role.updated_at,
+                        'permissions': [{'id': p.id, 'name': p.name, 'description': p.description, 'page': p.page} for p
+                                        in permissions]
+                    })
+            else:
+                roles = Role.objects.all()
+                role_data = [
+                    {'id': role.id, 'name': role.name, 'created_at': role.created_at, 'updated_at': role.updated_at} for
+                    role in roles]
+
+            return Response(role_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request, id):
+        try:
+            delete_role = id.replace('-', '')
+            delete_role = Role.objects.get(id=id)
+            delete_role.delete()
+            return Response("Xóa thành công")
+        except Role.DoesNotExist:
+            return Response("Không tìm thấy Role")
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        action = request.query_params.get('action')
+        if action == 'create_role':
+            return self.create_role(request)
+        elif action == 'update_permission_for_role':
+            return self.update_permission_for_role(request)
+        return Response({"message": "Action not specified or unknown"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def create_role(self, request):
+        serializer = CreateNewRoleSerializers(data=request.data)
+        if serializer.is_valid():
+            role = serializer.validated_data['name']
+            try:
+                exist = Role.objects.get(name=role)
+            except ObjectDoesNotExist:
+                Role(name=role).save()
+                return Response("Create Success", status=200)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update_permission_for_role(self, request):
+        serializer = UpdatePermissionForRole(data=request.data)
+        if serializer.is_valid():
+            roleID = serializer.validated_data['roleID']
+            test = Role.objects.get(id=roleID)
+            return Response(roleID, status=200)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AccountInformationView(UsersViews):
 
     def get(self, request):
         response_data = []
@@ -54,21 +140,6 @@ class UsersViews(APIView):
 
         return Response(response_data)
 
-
-class createRole(APIView):
-    def post(self, request):
-        serializer = CreateNewRoleSerializers(data=request.data)
-        if serializer.is_valid():
-            role = serializer.validated_data['name']
-        try:
-            exist = Role.objects.get(name=role)
-        except ObjectDoesNotExist:
-            Role(name=role).save()
-        return Response("OK")
-
-
-class DeleteUserByUsernameView(APIView):
-
     def delete(self, request, id):
         try:
             instance = User.objects.filter(id=id)
@@ -76,34 +147,6 @@ class DeleteUserByUsernameView(APIView):
             return Response("Success")
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['GET'])
-def get_roles(request):
-    permission = request.query_params.get('permission', 'false').lower() == 'true'
-
-    try:
-        if permission:
-            roles = Role.objects.prefetch_related('rolepermission_set__permission').all()
-            role_data = []
-            for role in roles:
-                role_permissions = role.rolepermission_set.all()
-                permissions = [rp.permission for rp in role_permissions]
-                role_data.append({
-                    'id': role.id,
-                    'name': role.name,
-                    'created_at': role.created_at,
-                    'updated_at': role.updated_at,
-                    'permissions': [{'id': p.id, 'name': p.name, 'description': p.description, 'page': p.page} for p in permissions]
-                })
-        else:
-            roles = Role.objects.all()
-            role_data = [{'id': role.id, 'name': role.name, 'created_at': role.created_at, 'updated_at': role.updated_at} for role in roles]
-
-        return Response(role_data, status=status.HTTP_200_OK)
-    except Exception as e:
-        print(e)
-        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -114,21 +157,22 @@ def update_role_permission(request):
     if not role_id or not permission_id:
         return Response({'error': 'roleID and permissionID are required'}, status=status.HTTP_400_BAD_REQUEST)
     role_id = role_id.replace('-', '')
-    # permission_id = permission_id.replace('-', '')
+    return HttpResponse((role_id, permission_id))
     try:
         # Check if the role exists in the database
         try:
             role = Role.objects.get(id=role_id)
         except Role.DoesNotExist:
             return Response({'error': 'Role does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Check if the role already has the specified permission
         if RolePermission.objects.filter(role_id=role_id, permission_id=permission_id).exists():
-            return Response({'error': f'Role ID: {role_id} already has permission: {permission_id}'}, status=status.HTTP_409_CONFLICT)
-        
+            return Response({'error': f'Role ID: {role_id} already has permission: {permission_id}'},
+                            status=status.HTTP_409_CONFLICT)
+
         # Create the role-permission association
         role_permission = RolePermission.objects.create(role_id=role_id, permission_id=permission_id)
-        
+
         return Response({
             'role_id': role_permission.role_id,
             'permission_id': role_permission.permission_id,
@@ -141,6 +185,7 @@ def update_role_permission(request):
     except Exception as e:
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['DELETE'])
 def remove_role_permission(request):
