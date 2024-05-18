@@ -151,7 +151,6 @@ def update_role_permission(request):
 
     if not role_id or not permission_id:
         return Response({'error': 'roleID and permissionID are required'}, status=status.HTTP_400_BAD_REQUEST)
-    role_id = role_id.replace('-', '')
     # permission_id = permission_id.replace('-', '')
     try:
         # Check if the role exists in the database
