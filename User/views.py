@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -239,3 +240,21 @@ def set_user_role(request):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+@api_view(['DELETE'])
+def delete_role(request, role_id):
+    try:
+        with transaction.atomic():
+            # Set the role_id of users with the given role_id to None
+            User.objects.filter(role_id=role_id).update(role_id=None)
+
+            # Delete RolePermission entries with the given role_id
+            RolePermission.objects.filter(role_id=role_id).delete()
+
+            # Delete the role
+            Role.objects.filter(id=role_id).delete()
+
+        return Response({'message': 'Role deleted successfully'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

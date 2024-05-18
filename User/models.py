@@ -32,7 +32,7 @@ class User(models.Model):
     display_name = models.CharField(max_length=191)
     username = models.CharField(max_length=191, unique=True)
     password = models.CharField(max_length=191)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
