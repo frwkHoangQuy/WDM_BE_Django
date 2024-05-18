@@ -28,6 +28,7 @@ class LoginView(APIView):
                 return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
             if check_password(password, user.password):
                 payload = create_token_payload(username)
+                
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
                 return Response({'access_token': token}, status=status.HTTP_200_OK)
             else:
@@ -62,7 +63,7 @@ class RegisterView(APIView):
                     username=username,
                     password=make_password(password),
                     display_name=display_name,
-                    role_id=role
+                    role_id=role.id
                 )
                 user.save()
                 return Response({'message': 'Tạo người dùng thành công'}, status=status.HTTP_201_CREATED)
