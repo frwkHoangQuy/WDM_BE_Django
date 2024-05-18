@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 
 from .models import Permission, Role, RolePermission, User
 
-from .serializers import CreateNewRoleSerializers, UserSerializers
+from .serializers import CreateNewRoleSerializers, UserSerializers, UpdateUserSerializer, SetUserRoleSerializer
 
 
 class UsersViews(APIView):
@@ -78,7 +78,7 @@ class DeleteUserByUsernameView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
+@api_view(['GET']) #find by username
 def find_by_username(request):
     username = request.query_params.get('username', None)
     if username is None:
@@ -93,6 +93,27 @@ def find_by_username(request):
     except Exception as e:
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['PATCH'])# update display name
+def update_user(request, id):
+    try:
+        # Check if the user exists
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = UpdateUserSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        display_name = serializer.validated_data['display_name']
+        
+        # Update the user's display name
+        user.display_name = display_name
+        user.save()
+        
+        return Response({'message': 'User updated successfully', 'user': {'id': user.id, 'display_name': user.display_name}}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Privilege
 @api_view(['GET'])
@@ -190,5 +211,31 @@ def remove_role_permission(request):
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+@api_view(['POST'])
+def set_user_role(request):
+    serializer = SetUserRoleSerializer(data=request.data)
     
+    if serializer.is_valid():
+        role_id = serializer.validated_data['roleID']
+        user_id = serializer.validated_data['userID']
+        
+        try:
+            # Check if the role exists
+            role = Role.objects.get(id=role_id)
+        except Role.DoesNotExist:
+            return Response({'error': 'Role does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            # Check if the user exists
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': f'User not found for id: {user_id}'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Update user's role
+        user.role = role
+        user.save()
+        
+        return Response({'message': 'User role updated successfully', 'user': {'id': user.id, 'role_id': user.role.id}}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

@@ -31,5 +31,9 @@ class RolePermissionSerializers(serializers.ModelSerializer):
 class CreateNewRoleSerializers(serializers.Serializer):
     name = serializers.CharField()
 
+class UpdateUserSerializer(serializers.Serializer):
+    display_name = serializers.CharField(max_length=191)
 
-
+class SetUserRoleSerializer(serializers.Serializer):
+    roleID = serializers.IntegerField()
+    userID = serializers.IntegerField()
