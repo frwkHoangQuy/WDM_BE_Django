@@ -42,7 +42,7 @@ class CreateNewRoleSerializers(serializers.Serializer):
 
 
 class UpdatePermissionForRole(serializers.Serializer):
-    roleID = serializers.UUIDField()
+    roleID = serializers.CharField()
     permissionID = serializers.CharField()
 
 

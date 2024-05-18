@@ -58,14 +58,12 @@ class RegisterView(APIView):
                     role = Role.objects.get(name=role_name)
                 except Role.DoesNotExist:
                     return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
-                
-                role_id = str(role.id)
-                role_id = role_id.replace('-', '')
+
                 user = User(
                     username=username,
                     password=make_password(password),
                     display_name=display_name,
-                    role_id=role_id
+                    role_id=role.id
                 )
                 user.save()
                 return Response({'message': 'Tạo người dùng thành công'}, status=status.HTTP_201_CREATED)

@@ -56,16 +56,8 @@ class PermissionViews(UsersViews):
             print(e)
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def delete(self, request, id):
-        try:
-            delete_role = id.replace('-', '')
-            delete_role = Role.objects.get(id=id)
-            delete_role.delete()
-            return Response("Xóa thành công")
-        except Role.DoesNotExist:
-            return Response("Không tìm thấy Role")
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def delete(self, request):
+        pass
 
     def post(self, request):
         action = request.query_params.get('action')
@@ -88,11 +80,34 @@ class PermissionViews(UsersViews):
 
     def update_permission_for_role(self, request):
         serializer = UpdatePermissionForRole(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             roleID = serializer.validated_data['roleID']
-            test = Role.objects.get(id=roleID)
-            return Response(roleID, status=200)
+            permissionID = serializer.validated_data['permissionID']
+            RolePermission(permission_id=permissionID, role_id=roleID).save()
+            return Response(status=200)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RoleDeleteViews(PermissionViews):
+    def delete(self, request, id):
+        try:
+            delete_role = Role.objects.get(id=id)
+            delete_role.delete()
+            return Response("Xóa thành công")
+        except Role.DoesNotExist:
+            return Response("Không tìm thấy Role")
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemovePermissionForRole(PermissionViews):
+
+    def delete(self, request):
+        roleID = request.data['roleID']
+        permissionID = request.data['permissionID']
+        RolePermission.objects.get(permission_id=permissionID, role_id=roleID).delete()
+        return Response("OK")
 
 
 class AccountInformationView(UsersViews):
@@ -103,8 +118,8 @@ class AccountInformationView(UsersViews):
         for user in users:
             try:
                 role = Role.objects.get(id=user.role_id)
-            except ObjectDoesNotExist:
-                return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+            except Role.DoesNotExist:
+                role = Role.objects.get(name='Admin')
             temp = {
                 'id': user.id,
                 'display_name': user.display_name,
@@ -120,7 +135,7 @@ class AccountInformationView(UsersViews):
                 for role_permission in role_permissions:
                     permission = Permission.objects.get(id=role_permission.permission_id)
                     permissionList.append({
-                        "id": str(permission.id),
+                        "id": permission.id,
                         "name": permission.name,
                         "description": permission.description,
                         "page": permission.page,
@@ -148,74 +163,45 @@ class AccountInformationView(UsersViews):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def post(self, request):
+        pass
 
-@api_view(['POST'])
-def update_role_permission(request):
-    role_id = request.data.get('roleID')
-    permission_id = request.data.get('permissionID')
 
-    if not role_id or not permission_id:
-        return Response({'error': 'roleID and permissionID are required'}, status=status.HTTP_400_BAD_REQUEST)
-    role_id = role_id.replace('-', '')
-    return HttpResponse((role_id, permission_id))
-    try:
-        # Check if the role exists in the database
+class UpdateRoleForUser(UsersViews):
+    def post(self, request):
+        user_id = request.data.get('userID')
+        role_id = request.data.get('roleID')
+
+        if not user_id or not role_id:
+            return Response({"error": "userID and roleID are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            update_user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
         try:
             role = Role.objects.get(id=role_id)
         except Role.DoesNotExist:
-            return Response({'error': 'Role does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Role not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the role already has the specified permission
-        if RolePermission.objects.filter(role_id=role_id, permission_id=permission_id).exists():
-            return Response({'error': f'Role ID: {role_id} already has permission: {permission_id}'},
-                            status=status.HTTP_409_CONFLICT)
-
-        # Create the role-permission association
-        role_permission = RolePermission.objects.create(role_id=role_id, permission_id=permission_id)
-
-        return Response({
-            'role_id': role_permission.role_id,
-            'permission_id': role_permission.permission_id,
-            'created_at': role_permission.created_at,
-            'updated_at': role_permission.updated_at
-        }, status=status.HTTP_201_CREATED)
-
-    except ObjectDoesNotExist as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        print(e)
-        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['DELETE'])
-def remove_role_permission(request):
-    role_id = request.data.get('roleID')
-    permission_id = request.data.get('permissionID')
-
-    if not role_id or not permission_id:
-        return Response({'error': 'role_id and permission_id are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        # Check if the role exists in the database
         try:
-            role = Role.objects.get(id=role_id)
-        except Role.DoesNotExist:
-            return Response({'error': 'Role does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+            update_user.role = role
+            update_user.save()
+        except Exception as e:
+            return Response({"error": f"An error occurred while updating the role: {str(e)}"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Check if the role has the specified permission
-        role_permission_check = RolePermission.objects.filter(role_id=role_id, permission_id=permission_id)
+        return Response({"message": "Role updated successfully."}, status=status.HTTP_200_OK)
 
-        if not role_permission_check.exists():
-            return Response({'error': f'Role ID: {role_id} does not have permission: {permission_id}'}, status=status.HTTP_409_CONFLICT)
 
-        # Delete the role-permission association
-        role_permission_check.delete()
-
-        return Response({'message': 'Permission removed from role successfully'}, status=status.HTTP_204_NO_CONTENT)
-
-    except ObjectDoesNotExist as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        print(e)
-        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+class UpdateNameForUser(UsersViews):
+    def patch(self, request, id):
+        display_name = request.data['display_name']
+        try:
+            update_user = User.objects.get(id=id)
+            update_user.display_name = display_name
+            update_user.save()
+        except ObjectDoesNotExist:
+            return Response(status=500)
+        return Response("OK")
