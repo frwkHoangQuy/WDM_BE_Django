@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 
 from .models import Permission, Role, RolePermission, User
 
-from .serializers import CreateNewRoleSerializers
+from .serializers import CreateNewRoleSerializers, UserSerializers
 
 
 class UsersViews(APIView):
@@ -79,6 +79,23 @@ class DeleteUserByUsernameView(APIView):
 
 
 @api_view(['GET'])
+def find_by_username(request):
+    username = request.query_params.get('username', None)
+    if username is None:
+        return Response({'error': 'username query parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.select_related('role').get(username=username)
+        user_serializer = UserSerializers(user)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(e)
+        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Privilege
+@api_view(['GET'])
 def get_roles(request):
     permission = request.query_params.get('permission', 'false').lower() == 'true'
 
@@ -104,7 +121,6 @@ def get_roles(request):
     except Exception as e:
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['POST'])
 def update_role_permission(request):
@@ -173,4 +189,6 @@ def remove_role_permission(request):
     except Exception as e:
         print(e)
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
     

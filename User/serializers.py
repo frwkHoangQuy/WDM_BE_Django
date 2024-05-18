@@ -3,37 +3,29 @@ from .models import User, Permission, Role, RolePermission
 import uuid
 
 
-class UserSerializers(serializers.Serializer):
-    id = serializers.UUIDField()
-    display_name = serializers.CharField()
-    username = serializers.CharField()
-    password = serializers.CharField()
-    role_id = serializers.UUIDField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
+class RoleSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'created_at', 'updated_at']
+
+class UserSerializers(serializers.ModelSerializer):
+    Role = RoleSerializers(source='role', read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'display_name', 'username', 'password', 'role_id', 'created_at', 'updated_at', 'Role']
 
 
-class PermissionSerializers(serializers.Serializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField()
-    description = serializers.CharField()
-    page = serializers.CharField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
+class PermissionSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ['id', 'name', 'description', 'page', 'created_at', 'updated_at']
 
 
-class RoleSerializers(serializers.Serializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
-
-
-class RolePermissionSerializers(serializers.Serializer):
-    role_id = serializers.UUIDField()
-    permission_id = serializers.UUIDField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
+class RolePermissionSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = RolePermission
+        fields = ['role_id', 'permission_id', 'created_at', 'updated_at']
 
 
 class CreateNewRoleSerializers(serializers.Serializer):

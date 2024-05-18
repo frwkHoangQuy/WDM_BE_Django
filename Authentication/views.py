@@ -59,8 +59,7 @@ class RegisterView(APIView):
                 except Role.DoesNotExist:
                     return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
                 
-                role_id = str(role.id)
-                role_id = role_id.replace('-', '')
+                role_id = role.id
                 user = User(
                     username=username,
                     password=make_password(password),

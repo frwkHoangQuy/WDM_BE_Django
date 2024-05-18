@@ -5,11 +5,11 @@ use WDM_BE_Django;
 -- ============================
 INSERT INTO Permission (id, name, description, page, created_at, updated_at)
 VALUES
-  ('perm1', 'View Report', 'Allows viewing reports', 'report', NOW(), NOW()),
-  ('perm2', 'Edit User', 'Allows editing users', 'user', NOW(), NOW()),
-  ('perm3', 'Access Lobby', 'Allows access to lobby', 'lobby', NOW(), NOW()),
-  ('perm4', 'Process Orders', 'Allows processing orders', 'order', NOW(), NOW()),
-  ('perm5', 'Manage Food Service', 'Allows managing food service', 'food_service', NOW(), NOW())
+  (1, 'View Report', 'Allows viewing reports', 'report', NOW(), NOW()),
+  (2, 'Edit User', 'Allows editing users', 'user', NOW(), NOW()),
+  (3, 'Access Lobby', 'Allows access to lobby', 'lobby', NOW(), NOW()),
+  (4, 'Process Orders', 'Allows processing orders', 'order', NOW(), NOW()),
+  (5, 'Manage Food Service', 'Allows managing food service', 'food_service', NOW(), NOW())
 ;
 
 -- ============================
@@ -17,8 +17,8 @@ VALUES
 -- ============================
 INSERT INTO Role (id, name, created_at, updated_at)
 VALUES
-  ('6ac907e7902f4feb8da20becac50bedc', 'Admin', NOW(), NOW()),
-  ('6ac907e7902f4feb8da20becac50beda', 'Staff', NOW(), NOW())
+  (1, 'Admin', NOW(), NOW()),
+  (2, 'Staff', NOW(), NOW())
 ;
 
 -- ============================
@@ -26,11 +26,11 @@ VALUES
 -- ============================
 INSERT INTO RolePermission (role_id, permission_id, created_at, updated_at)
 VALUES
-  ('6ac907e7902f4feb8da20becac50bedc', 'perm1', NOW(), NOW()),
-  ('6ac907e7902f4feb8da20becac50bedc', 'perm2', NOW(), NOW()),
-  ('6ac907e7902f4feb8da20becac50bedc', 'perm3', NOW(), NOW()),
-  ('6ac907e7902f4feb8da20becac50bedc', 'perm4', NOW(), NOW()),
-  ('6ac907e7902f4feb8da20becac50bedc', 'perm5', NOW(), NOW())
+  (1, 1, NOW(), NOW()),
+  (1, 2, NOW(), NOW()),
+  (1, 3, NOW(), NOW()),
+  (1, 4, NOW(), NOW()),
+  (1, 5, NOW(), NOW())
 ;
 
 -- ============================
@@ -50,29 +50,29 @@ INSERT INTO `User`
 )
 VALUES
 (
-    '827cdd116faa437598a10adb739e20e2',
+    1,
     'canh pham',
     'test',
     'pbkdf2_sha256$390000$wd46Emene7YLBYvIfFzn5Y$kG5ex1J3TNMC4RIBTWybMlj4Du3Z4Zq5rqGee9DE6Bk=',
-    '6ac907e7902f4feb8da20becac50bedc',
+    1,
     NOW(),
     NOW()
 ),
 (
-    '827cdd116faa437598a10adb739e20e1',
+    2,
     'Quy Khung',
     'test1',
     'pbkdf2_sha256$390000$wd46Emene7YLBYvIfFzn5Y$kG5ex1J3TNMC4RIBTWybMlj4Du3Z4Zq5rqGee9DE6Bk=',
-    '6ac907e7902f4feb8da20becac50bedc',
+    1,
     NOW(),
     NOW()
 ),
 (
-    '827cdd116faa437598a10adb739e20e4',
+    3,
     'Minh Tue',
     'test2',
     'pbkdf2_sha256$390000$wd46Emene7YLBYvIfFzn5Y$kG5ex1J3TNMC4RIBTWybMlj4Du3Z4Zq5rqGee9DE6Bk=',
-    '6ac907e7902f4feb8da20becac50bedc',
+    1,
     NOW(),
     NOW()
 );
