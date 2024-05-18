@@ -16,14 +16,15 @@ class UsersViews(APIView):
         response_data = []
         users = User.objects.all()
         for user in users:
-            try:
-                role = Role.objects.get(id=user.role_id)
-            except ObjectDoesNotExist:
-                return Response({'error': 'Role không tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+
+            role_id = user.role_id
+            if role_id:
+                role = Role.objects.get(id=role_id)
+                temp['role'] = role.name
+                temp['role_id'] = role_id
             temp = {
                 'id': user.id,
                 'display_name': user.display_name,
-                'role_id': role.id,
                 'username': user.username,
                 'password': user.password,
                 'created_at': user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -31,7 +32,7 @@ class UsersViews(APIView):
             }
             permissionList = []
             try:
-                role_permissions = RolePermission.objects.filter(role_id=role.id)
+                role_permissions = RolePermission.objects.filter(role_id=role_id)
                 for role_permission in role_permissions:
                     permission = Permission.objects.get(id=role_permission.permission_id)
                     permissionList.append({
@@ -45,11 +46,6 @@ class UsersViews(APIView):
             except ObjectDoesNotExist:
                 pass
             temp['PermissionList'] = permissionList
-
-            try:
-                temp['role'] = role.name
-            except ObjectDoesNotExist:
-                temp['role'] = None
 
             response_data.append(temp)
 
