@@ -10,8 +10,6 @@ from .models import Permission, Role, RolePermission, User
 
 from .serializers import CreateNewRoleSerializers, UpdatePermissionForRole
 
-logger = logging.getLogger(__name__)
-
 
 class UsersViews(APIView):
 
@@ -93,10 +91,12 @@ class PermissionViews(UsersViews):
                     return Response({"error": "Integrity error occurred"}, status=status.HTTP_400_BAD_REQUEST)
                 except DatabaseError as e:
                     logger.error(f"Database error while creating role: {str(e)}")
-                    return Response({"error": "Database error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response({"error": "Database error occurred"},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 except Exception as e:
                     logger.error(f"Unexpected error while creating role: {str(e)}", exc_info=True)
-                    return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response({"error": "An unexpected error occurred"},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update_permission_for_role(self, request):
@@ -134,7 +134,6 @@ class RoleDeleteViews(APIView):
         except Exception as e:
             logger.error(f"Unexpected error while deleting role: {str(e)}", exc_info=True)
             return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 class RemovePermissionForRole(APIView):
@@ -242,10 +241,12 @@ class UpdateRoleForUser(APIView):
             update_user.save()
         except DatabaseError as e:
             logger.error(f"Database error while updating the role for user {user_id}: {str(e)}", exc_info=True)
-            return Response({"error": "Database error occurred while updating the role."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Database error occurred while updating the role."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(f"Unexpected error while updating the role for user {user_id}: {str(e)}", exc_info=True)
-            return Response({"error": f"An error occurred while updating the role: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": f"An error occurred while updating the role: {str(e)}"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         logger.info(f"Role for user {user_id} updated successfully to role {role_id}.")
         return Response({"message": "Role updated successfully."}, status=status.HTTP_200_OK)
@@ -273,11 +274,11 @@ class UpdateNameForUser(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except DatabaseError as e:
             logger.error(f"Database error while updating the display name for user {id}: {str(e)}", exc_info=True)
-            return Response({"error": "Database error occurred while updating the display name."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Database error occurred while updating the display name."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             logger.error(f"Unexpected error while updating the display name for user {id}: {str(e)}", exc_info=True)
             return Response({"error": "An unexpected error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         logger.info(f"Display name for user {id} updated successfully.")
         return Response({"message": "Display name updated successfully."}, status=status.HTTP_200_OK)
-
