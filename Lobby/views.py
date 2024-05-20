@@ -1,18 +1,19 @@
-from django.shortcuts import get_list_or_404
 from django.utils import timezone
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
 
-from .models import LobType, Lobby
-from .serializers import LobTypeSerializer
+from All_models.models import LobType, Lobby, Wedding
+from .serializers import LobTypeSerializer, LobbySerializers, CustomLobbySerializers
+
+
+# ##################### LOBBY TYPE ##################### #
 
 
 # Get Lob Type
 class LobTypeViews(generics.ListAPIView):
-    queryset = LobType.objects.all()
+    queryset = LobType.objects.filter(deleted_at=None)
     serializer_class = LobTypeSerializer
 
 
@@ -41,3 +42,26 @@ class LobTypeSoftDeleteViews(generics.UpdateAPIView):
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ##################### LOBBY  ##################### #
+
+
+# Get Lobby
+class LobbyViews(generics.ListAPIView):
+    queryset = Lobby.objects.all()
+    serializer_class = CustomLobbySerializers
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        request = self.request
+        date = request.query_params.get('date')
+        if date:
+            filtered_weddings = Wedding.objects.filter(wedding_date=date)
+            context['filtered_weddings'] = filtered_weddings
+        return context
+
+
+
+
+
