@@ -10,17 +10,26 @@ from .models import LobType, Lobby
 from .serializers import LobTypeSerializer
 
 
+# Get Lob Type
 class LobTypeViews(generics.ListAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
 
 
+# Update Lob Type
 class LobTypeUpdateViews(generics.UpdateAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
     lookup_field = 'id'
 
 
+# Create LobType
+class LobTypeCreateViews(generics.CreateAPIView):
+    queryset = LobType.objects.all()
+    serializer_class = LobTypeSerializer
+
+
+# Soft Delete Lob Type
 class LobTypeSoftDeleteViews(generics.UpdateAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
