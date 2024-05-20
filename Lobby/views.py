@@ -13,7 +13,7 @@ from .serializers import LobTypeSerializer, LobbySerializers, CustomLobbySeriali
 
 # Get Lob Type
 class LobTypeViews(generics.ListAPIView):
-    queryset = LobType.objects.filter(deleted_at=None)
+    queryset = LobType.objects.filter(deleted_at='null')
     serializer_class = LobTypeSerializer
 
 
@@ -49,8 +49,15 @@ class LobTypeSoftDeleteViews(generics.UpdateAPIView):
 
 # Get Lobby
 class LobbyViews(generics.ListAPIView):
-    queryset = Lobby.objects.all()
     serializer_class = CustomLobbySerializers
+
+    def get_queryset(self):
+        lob_type_id = self.request.query_params.get('lob_type_id')
+        if id is not None:
+            queryset = Lobby.objects.all().filter(lob_type_id=lob_type_id)
+        else:
+            queryset = {}
+        return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
