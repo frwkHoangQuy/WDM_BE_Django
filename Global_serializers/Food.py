@@ -5,5 +5,6 @@ from rest_framework import serializers
 
 class FoodSerializers(serializers.ModelSerializer):
     class Meta:
-        db_table = 'Food'
-        fields = '__all__'
+        model = Food
+        fields = ['id', 'name', 'price', 'status', 'created_at',
+                  'updated_at', 'deleted_at', 'inventory']
