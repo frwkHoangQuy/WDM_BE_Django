@@ -1,13 +1,15 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
+from rest_framework import generics, status
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import status
 
 from All_models.models import LobType, Lobby, Wedding
-from .serializers import CustomLobbySerializers
 from Global_serializers.LobType import LobTypeSerializer
 from Global_serializers.Lobby import LobbySerializers
+from .serializers import CustomLobbySerializers
 
 
 # ##################### LOBBY TYPE ##################### #
@@ -56,7 +58,7 @@ class LobbyViews(generics.ListAPIView):
     def get_queryset(self):
         lob_type_id = self.request.query_params.get('lob_type_id')
         if id is not None:
-            queryset = Lobby.objects.all().filter(lob_type_id=lob_type_id)
+            queryset = Lobby.objects.all().filter(lob_type_id=lob_type_id, deleted_at=None)
         else:
             queryset = {}
         return queryset
@@ -75,6 +77,16 @@ class LobbyCreateView(generics.CreateAPIView):
     queryset = Lobby.objects.all()
     serializer_class = LobbySerializers
 
+
+@api_view(['PATCH'])
+def LobbyDeleteView(request, id):
+    try:
+        soft_delete_lobby = Lobby.objects.get(id=id)
+        soft_delete_lobby.deleted_at = timezone.now()
+        soft_delete_lobby.save()
+        return Response({"detail": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+    except ObjectDoesNotExist:
+        return Response({"detail": "Không tìm thấy Lobby cần xóa"}, status=status.HTTP_404_NOT_FOUND)
 
 
 

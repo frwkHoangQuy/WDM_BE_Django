@@ -18,7 +18,7 @@ class Shift(models.Model):
     name = models.CharField(max_length=191)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.CharField(default='null', null=True, max_length=191)
+    deleted_at = models.CharField(default=None, null=True, max_length=191)
 
     class Meta:
         db_table = 'Shift'
@@ -34,7 +34,7 @@ class LobType(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     type_name = models.CharField(max_length=191)
-    deleted_at = models.CharField(default='null', null=True, max_length=191)
+    deleted_at = models.CharField(default=None, null=True, max_length=191)
 
 
 class Lobby(models.Model):
@@ -43,7 +43,7 @@ class Lobby(models.Model):
     id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     lob_type = models.ForeignKey(LobType, on_delete=models.CASCADE)
-    deleted_at = models.CharField(default='null', null=True, max_length=191)
+    deleted_at = models.CharField(default=None, null=True, max_length=191)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
 
