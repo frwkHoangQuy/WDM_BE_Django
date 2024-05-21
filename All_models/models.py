@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from .Mixin import SoftDelete, SoftDeleteManager
 
 
 class Customer(models.Model):
@@ -13,18 +14,20 @@ class Customer(models.Model):
         db_table = 'Customer'
 
 
-class Shift(models.Model):
+class Shift(SoftDelete):
     id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.CharField(default=None, null=True, max_length=191)
 
+    objects = SoftDeleteManager()
+
     class Meta:
         db_table = 'Shift'
 
 
-class LobType(models.Model):
+class LobType(SoftDelete):
     class Meta:
         db_table = "LobType"
     id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False, max_length=36)
@@ -36,16 +39,19 @@ class LobType(models.Model):
     type_name = models.CharField(max_length=191)
     deleted_at = models.CharField(default=None, null=True, max_length=191)
 
+    objects = SoftDeleteManager()
 
-class Lobby(models.Model):
+
+class Lobby(SoftDelete):
     class Meta:
         db_table = "Lobby"
     id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     lob_type = models.ForeignKey(LobType, on_delete=models.CASCADE)
-    deleted_at = models.CharField(default=None, null=True, max_length=191)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = SoftDeleteManager()
 
 
 class Wedding(models.Model):

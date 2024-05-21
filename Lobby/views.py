@@ -17,7 +17,7 @@ from .serializers import CustomLobbySerializers
 
 # Get Lob Type
 class LobTypeViews(generics.ListAPIView):
-    queryset = LobType.objects.filter(deleted_at=None)
+    queryset = LobType.objects.except_soft_delete()
     serializer_class = LobTypeSerializer
 
 
@@ -42,8 +42,7 @@ class LobTypeSoftDeleteViews(generics.UpdateAPIView):
 
     def partial_update(self, request, **kwargs):
         instance = self.get_object()
-        instance.deleted_at = timezone.now()
-        instance.save()
+        instance.soft_delete()
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -58,7 +57,7 @@ class LobbyViews(generics.ListAPIView):
     def get_queryset(self):
         lob_type_id = self.request.query_params.get('lob_type_id')
         if id is not None:
-            queryset = Lobby.objects.all().filter(lob_type_id=lob_type_id, deleted_at=None)
+            queryset = Lobby.objects.except_soft_delete(lob_type_id=lob_type_id)
         else:
             queryset = {}
         return queryset
