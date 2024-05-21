@@ -87,8 +87,7 @@ class LobbyUpdateView(generics.UpdateAPIView):
 def LobbyDeleteView(request, id):
     try:
         soft_delete_lobby = Lobby.objects.get(id=id)
-        soft_delete_lobby.deleted_at = timezone.now()
-        soft_delete_lobby.save()
+        soft_delete_lobby.soft_delete()
         return Response({"detail": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
     except ObjectDoesNotExist:
         return Response({"detail": "Không tìm thấy Lobby cần xóa"}, status=status.HTTP_404_NOT_FOUND)
