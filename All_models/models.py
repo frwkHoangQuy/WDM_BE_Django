@@ -181,5 +181,7 @@ class Food(SoftDelete):
     updated_at = models.DateTimeField(auto_now=True)
     inventory = models.IntegerField(null=False)
 
+    objects = SoftDeleteManager()
+
     class Meta:
         db_table = "Food"

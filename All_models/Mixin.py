@@ -16,3 +16,6 @@ class SoftDelete(models.Model):
 class SoftDeleteManager(models.Manager):
     def except_soft_delete(self, **kwargs):
         return super().filter(deleted_at__isnull=True, **kwargs)
+
+    def soft_deleted(self):
+        return super().filter(deleted_at__isnull=False)
