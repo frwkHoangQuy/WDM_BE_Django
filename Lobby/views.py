@@ -5,7 +5,9 @@ from rest_framework import generics
 from rest_framework import status
 
 from All_models.models import LobType, Lobby, Wedding
-from .serializers import LobTypeSerializer, LobbySerializers, CustomLobbySerializers
+from .serializers import CustomLobbySerializers
+from Global_serializers.LobType import LobTypeSerializer
+from Global_serializers.Lobby import LobbySerializers
 
 
 # ##################### LOBBY TYPE ##################### #
@@ -67,6 +69,15 @@ class LobbyViews(generics.ListAPIView):
             filtered_weddings = Wedding.objects.filter(wedding_date=date)
             context['filtered_weddings'] = filtered_weddings
         return context
+
+
+class LobbyCreateView(generics.CreateAPIView):
+    queryset = Lobby.objects.all()
+    serializer_class = LobbySerializers
+
+
+
+
 
 
 

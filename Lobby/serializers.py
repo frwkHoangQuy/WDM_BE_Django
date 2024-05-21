@@ -1,20 +1,6 @@
 from rest_framework import serializers
-from All_models.models import LobType, Lobby
 from Global_serializers.Wedding import WeddingSerializers
-
-
-class LobTypeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = LobType
-        fields = '__all__'
-
-
-class LobbySerializers(serializers.ModelSerializer):
-
-    class Meta:
-        model = Lobby
-        fields = '__all__'
+from All_models.models import Lobby
 
 
 class CustomLobbySerializers(serializers.ModelSerializer):
