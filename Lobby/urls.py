@@ -1,6 +1,8 @@
 from django.urls import path, include
 from .views import (LobTypeViews, LobTypeUpdateViews, LobTypeSoftDeleteViews,
-                    LobTypeCreateViews, LobbyViews, LobbyCreateView, LobbyDeleteView)
+                    LobTypeCreateViews, LobbyViews, LobbyCreateView, LobbyDeleteView,
+                    LobbyUpdateView
+                    )
 
 
 urlpatterns = [
@@ -9,6 +11,7 @@ urlpatterns = [
     path('lobby/type/create/', LobTypeCreateViews.as_view(), name='create_lob_type'),
     path('lobby/types/', LobTypeViews.as_view(), name="get_lobby_type"),
     path('lobby/create/', LobbyCreateView.as_view(), name='create_lobby'),
+    path('lobby/<str:id>/update/', LobbyUpdateView.as_view(), name='update_lobby'),
     path('lobby/<str:id>/soft-delete/', LobbyDeleteView, name='soft_delete_lobby'),
     path('lobby/', LobbyViews.as_view(), name='get_lobby')
 ]

@@ -56,10 +56,10 @@ class LobbyViews(generics.ListAPIView):
 
     def get_queryset(self):
         lob_type_id = self.request.query_params.get('lob_type_id')
-        if id is not None:
+        if lob_type_id is not None:
             queryset = Lobby.objects.except_soft_delete(lob_type_id=lob_type_id)
         else:
-            queryset = {}
+            queryset = Lobby.objects.all()
         return queryset
 
     def get_serializer_context(self):
@@ -77,6 +77,12 @@ class LobbyCreateView(generics.CreateAPIView):
     serializer_class = LobbySerializers
 
 
+class LobbyUpdateView(generics.UpdateAPIView):
+    queryset = Lobby.objects.all()
+    serializer_class = LobbySerializers
+    lookup_field = 'id'
+
+
 @api_view(['PATCH'])
 def LobbyDeleteView(request, id):
     try:
@@ -86,11 +92,3 @@ def LobbyDeleteView(request, id):
         return Response({"detail": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
     except ObjectDoesNotExist:
         return Response({"detail": "Không tìm thấy Lobby cần xóa"}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-
-
-
