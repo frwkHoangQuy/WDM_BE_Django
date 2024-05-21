@@ -181,5 +181,22 @@ class Food(SoftDelete):
     updated_at = models.DateTimeField(auto_now=True)
     inventory = models.IntegerField(null=False)
 
+    objects = SoftDeleteManager()
+
     class Meta:
         db_table = "Food"
+
+
+class Service(SoftDelete):
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=191)
+    name = models.CharField(max_length=191, null=False)
+    price = models.IntegerField(null=False)
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    inventory = models.IntegerField(null=False)
+
+    objects = SoftDeleteManager()
+
+    class Meta:
+        db_table = "Service"

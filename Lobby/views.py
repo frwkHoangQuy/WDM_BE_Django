@@ -83,12 +83,11 @@ class LobbyUpdateView(generics.UpdateAPIView):
     lookup_field = 'id'
 
 
-@api_view(['PATCH'])
-def LobbyDeleteView(request, id):
-    try:
-        soft_delete_lobby = Lobby.objects.get(id=id)
-        soft_delete_lobby.deleted_at = timezone.now()
-        soft_delete_lobby.save()
-        return Response({"detail": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
-    except ObjectDoesNotExist:
-        return Response({"detail": "Không tìm thấy Lobby cần xóa"}, status=status.HTTP_404_NOT_FOUND)
+class LobbyDeleteView(APIView):
+    def patch(self, request, id):
+        try:
+            soft_delete_lobby = Lobby.objects.get(id=id)
+            soft_delete_lobby.soft_delete()
+            return Response({"detail": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+        except ObjectDoesNotExist:
+            return Response({"detail": "Không tìm thấy Lobby cần xóa"}, status=status.HTTP_404_NOT_FOUND)
