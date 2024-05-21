@@ -13,7 +13,7 @@ from .serializers import LobTypeSerializer, LobbySerializers, CustomLobbySeriali
 
 # Get Lob Type
 class LobTypeViews(generics.ListAPIView):
-    queryset = LobType.objects.filter(deleted_at='null')
+    queryset = LobType.objects.filter(deleted_at=None)
     serializer_class = LobTypeSerializer
 
 

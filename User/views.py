@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 import logging
 
-from .models import Permission, Role, RolePermission, User
+from All_models.models import Permission, Role, RolePermission, User
 
 from .serializers import CreateNewRoleSerializers, UpdatePermissionForRole
 

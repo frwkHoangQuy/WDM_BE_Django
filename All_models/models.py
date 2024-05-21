@@ -1,9 +1,9 @@
-from django.db import models
 import uuid
+from django.db import models
 
 
 class Customer(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4().hex, max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     phone = models.CharField(max_length=191, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -14,11 +14,11 @@ class Customer(models.Model):
 
 
 class Shift(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4().hex, max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.CharField(default='null', max_length=191)
+    deleted_at = models.CharField(default='null', null=True, max_length=191)
 
     class Meta:
         db_table = 'Shift'
@@ -27,31 +27,29 @@ class Shift(models.Model):
 class LobType(models.Model):
     class Meta:
         db_table = "LobType"
-    id = models.CharField(primary_key=True, default=uuid.uuid4().hex, editable=False, max_length=32)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, editable=False, max_length=36)
     max_table_count = models.IntegerField()
     min_table_price = models.IntegerField()
     deposit_percent = models.IntegerField()
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     type_name = models.CharField(max_length=191)
-    deleted_at = models.CharField(default='null', max_length=191)
+    deleted_at = models.CharField(default='null', null=True, max_length=191)
 
 
 class Lobby(models.Model):
-
     class Meta:
         db_table = "Lobby"
-
-    id = models.CharField(primary_key=True, default=uuid.uuid4().hex, max_length=32)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     name = models.CharField(max_length=191)
     lob_type = models.ForeignKey(LobType, on_delete=models.CASCADE)
-    deleted_at = models.CharField(default='null', max_length=191)
+    deleted_at = models.CharField(default='null', null=True, max_length=191)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 class Wedding(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4().hex, max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     groom = models.CharField(max_length=191)
     bride = models.CharField(max_length=191)
     wedding_date = models.DateTimeField()
@@ -69,7 +67,7 @@ class Wedding(models.Model):
 
 
 class ServiceOrder(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4(), max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     service_id = models.CharField(max_length=191)
     service_name = models.CharField(max_length=191)
     service_price = models.IntegerField()
@@ -84,7 +82,7 @@ class ServiceOrder(models.Model):
 
 
 class FoodOrder(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4(), max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     food_id = models.CharField(max_length=191)
     food_name = models.CharField(max_length=191)
     food_price = models.IntegerField()
@@ -99,7 +97,7 @@ class FoodOrder(models.Model):
 
 
 class Bill(models.Model):
-    id = models.CharField(primary_key=True, default=uuid.uuid4(), max_length=191)
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
     wedding = models.ForeignKey(Wedding, on_delete=models.CASCADE)
     payment_date = models.DateTimeField()
     service_total_price = models.IntegerField()
@@ -116,6 +114,53 @@ class Bill(models.Model):
         db_table = 'Bill'
 
 
+class Permission(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    name = models.CharField(max_length=191)
+    description = models.CharField(max_length=191, null=True, blank=True)
+    page = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Permission'
+        constraints = [
+            models.UniqueConstraint(fields=['page'], name='Permission_page_key')
+        ]
 
 
+class Role(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    name = models.CharField(max_length=191, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'Role'
+
+
+class User(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.uuid4, max_length=36)
+    display_name = models.CharField(max_length=191)
+    username = models.CharField(max_length=191, unique=True)
+    password = models.CharField(max_length=191)
+    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "User"
+
+
+class RolePermission(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'RolePermission'
+        constraints = [
+            models.UniqueConstraint(fields=['role', 'permission'], name='unique_role_permission')
+        ]
+        unique_together = [['role', 'permission']]
