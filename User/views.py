@@ -4,7 +4,6 @@ from django.db import DatabaseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-import logging
 
 from All_models.models import Permission, Role, RolePermission, User
 
