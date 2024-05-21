@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Permission, Role, RolePermission
+from All_models.models import User, Permission, Role, RolePermission
 import uuid
 
 

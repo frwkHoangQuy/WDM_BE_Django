@@ -1,3 +1,5 @@
 db_congfig.py
 __pycache__/
 debug.log
+All_models/migrations/*
+!All_models/migrations/__init__.py

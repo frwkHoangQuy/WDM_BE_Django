@@ -1,4 +1,4 @@
-from User.models import User, Role, RolePermission, Permission
+from All_models.models import User, Role, RolePermission, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 

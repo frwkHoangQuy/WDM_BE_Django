@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from User.models import User, Role
+from All_models.models import User, Role
 from .serializers import LoginSerializer, RegisterSerializer
 
 import jwt
