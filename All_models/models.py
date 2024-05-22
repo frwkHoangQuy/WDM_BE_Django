@@ -180,6 +180,7 @@ class Food(SoftDelete):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     inventory = models.IntegerField(null=False)
+    image = models.ImageField(upload_to='food_image/', default=None, null=True)
 
     objects = SoftDeleteManager()
 
@@ -195,8 +196,12 @@ class Service(SoftDelete):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     inventory = models.IntegerField(null=False)
+    image = models.ImageField(upload_to='service_image/', default=None, null=True)
 
     objects = SoftDeleteManager()
 
     class Meta:
         db_table = "Service"
+
+
+

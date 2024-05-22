@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import os
 
 from pathlib import Path
 # settings.py
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'FoodService',
     'Lobby',
     'Authentication',
+    'File',
     'Order',
     'Report',
     'User',
@@ -151,29 +153,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#         },
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'debug.log',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console', 'file'],
-#             'level': 'DEBUG',
-#         },
-#         'WDM_BE': {
-#             'handlers': ['console', 'file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
