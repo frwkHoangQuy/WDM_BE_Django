@@ -1,5 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.shortcuts import get_list_or_404
+from django.utils.dateparse import parse_datetime
 
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -55,20 +57,20 @@ class LobbyViews(generics.ListAPIView):
     serializer_class = CustomLobbySerializers
 
     def get_queryset(self):
-        lob_type_id = self.request.query_params.get('lob_type_id')
-        if lob_type_id is not None:
-            queryset = Lobby.objects.except_soft_delete(lob_type_id=lob_type_id)
-        else:
-            queryset = Lobby.objects.all()
+        queryset = Lobby.objects.except_soft_delete()
+        lobby_id = self.request.query_params.get('lob_type_id')
+        if lobby_id is not None:
+            queryset = queryset.filter(lob_type_id=lobby_id)
         return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        request = self.request
-        date = request.query_params.get('date')
+        date = self.request.query_params.get('date')
         if date:
             filtered_weddings = Wedding.objects.filter(wedding_date=date)
             context['filtered_weddings'] = filtered_weddings
+        else:
+            context['filtered_weddings'] = Wedding.objects.none()
         return context
 
 
