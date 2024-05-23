@@ -12,7 +12,8 @@ from .serializers import CreateNewRoleSerializers, UpdatePermissionForRole
 from Authentication.Middleware.jwt_authentication import PermissionRequiredMixin
 
 
-class UsersViews(APIView):
+class UsersViews(PermissionRequiredMixin, APIView):
+    permission_required = 'Edit User'
 
     def get(self, request):
         pass

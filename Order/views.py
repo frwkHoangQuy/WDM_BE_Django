@@ -10,13 +10,19 @@ from rest_framework.response import Response
 
 from .serializers import CustomWeddingSerializers, CustomCreateWeddingSerializers
 
+from Authentication.Middleware.jwt_authentication import PermissionRequiredMixin
 
-class WeddingListView(APIView):
+
+class OrderAccessPermission(PermissionRequiredMixin):
+    permission_required = 'Process Orders'
+
+
+class WeddingListView(OrderAccessPermission, APIView):
     def get(self, request):
         return Response([], status=200)
 
 
-class WeddingCreateView(generics.CreateAPIView):
+class WeddingCreateView(OrderAccessPermission, generics.CreateAPIView):
     queryset = Wedding.objects.all()
     serializer_class = CustomCreateWeddingSerializers
 

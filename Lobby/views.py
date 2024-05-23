@@ -12,32 +12,36 @@ from All_models.models import LobType, Lobby, Wedding
 from Global_serializers.LobType import LobTypeSerializer
 from Global_serializers.Lobby import LobbySerializers
 from .serializers import CustomLobbySerializers
+from Authentication.Middleware.jwt_authentication import  PermissionRequiredMixin
 
+
+class LobbyAccessPermission(PermissionRequiredMixin):
+    permission_required = 'Access Lobby'
 
 # ##################### LOBBY TYPE ##################### #
 
 
 # Get Lob Type
-class LobTypeViews(generics.ListAPIView):
+class LobTypeViews(LobbyAccessPermission, generics.ListAPIView):
     queryset = LobType.objects.except_soft_delete()
     serializer_class = LobTypeSerializer
 
 
 # Update Lob Type
-class LobTypeUpdateViews(generics.UpdateAPIView):
+class LobTypeUpdateViews(LobbyAccessPermission, generics.UpdateAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
     lookup_field = 'id'
 
 
 # Create LobType
-class LobTypeCreateViews(generics.CreateAPIView):
+class LobTypeCreateViews(LobbyAccessPermission, generics.CreateAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
 
 
 # Soft Delete Lob Type
-class LobTypeSoftDeleteViews(generics.UpdateAPIView):
+class LobTypeSoftDeleteViews(LobbyAccessPermission, generics.UpdateAPIView):
     queryset = LobType.objects.all()
     serializer_class = LobTypeSerializer
     lookup_field = 'id'
@@ -53,7 +57,7 @@ class LobTypeSoftDeleteViews(generics.UpdateAPIView):
 
 
 # Get Lobby
-class LobbyViews(generics.ListAPIView):
+class LobbyViews(LobbyAccessPermission, generics.ListAPIView):
     serializer_class = CustomLobbySerializers
 
     def get_queryset(self):
@@ -74,18 +78,18 @@ class LobbyViews(generics.ListAPIView):
         return context
 
 
-class LobbyCreateView(generics.CreateAPIView):
+class LobbyCreateView(LobbyAccessPermission, generics.CreateAPIView):
     queryset = Lobby.objects.all()
     serializer_class = LobbySerializers
 
 
-class LobbyUpdateView(generics.UpdateAPIView):
+class LobbyUpdateView(LobbyAccessPermission, generics.UpdateAPIView):
     queryset = Lobby.objects.all()
     serializer_class = LobbySerializers
     lookup_field = 'id'
 
 
-class LobbyDeleteView(APIView):
+class LobbyDeleteView(LobbyAccessPermission, APIView):
     def patch(self, request, id):
         try:
             soft_delete_lobby = Lobby.objects.get(id=id)
