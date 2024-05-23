@@ -1,9 +1,9 @@
 # Hướng dẫn cài đặt
 ## 1. 1. Cài đặt các gói phần mềm
-Trước tiên, cần cài đặt các gói phần mềm cần thiết cho dự án bằng cách chạy lệnh sau trong terminal:
+Trước tiên, cần cài đặt các gói phần mềm, sử dụng conda để cài đặt các package cần thiết cho môi trường ảo bằng lệnh sau:
 
 ```commandline
-pip install -r requirements.txt
+conda create --name <Tên môi trường ảo> --file requirements.txt
 ```
 ## 2. Cấu hình cơ sở dữ liệu
 Tạo một file db_config.py trong thư mục gốc của dự án và điền thông tin cấu hình của cơ sở dữ liệu MySQL như sau:
