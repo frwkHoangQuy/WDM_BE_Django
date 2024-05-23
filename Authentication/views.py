@@ -32,7 +32,6 @@ class LoginView(APIView):
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
                 return Response({'access_token': token}, status=status.HTTP_200_OK)
             else:
-                print("Authentication failed: Invalid credentials")
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -90,5 +89,3 @@ class VerifyTokenViews(APIView):
             return Response("Token hết hạn", status=status.HTTP_401_UNAUTHORIZED)
         except jwt.InvalidTokenError:
             return Response("Token không hợp lệ", status=status.HTTP_401_UNAUTHORIZED)
-
-
